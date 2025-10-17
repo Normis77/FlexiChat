@@ -9,6 +9,7 @@ import { BlockPalette } from './BlockPalette';
 import { Canvas } from './Canvas';
 import { Inspector } from './Inspector';
 import { TemplateSelector } from './TemplateSelector';
+import { UserManual } from '../Help/UserManual';
 import styles from './PageBuilder.module.css';
 
 export const PageBuilder: React.FC = () => {
@@ -16,6 +17,7 @@ export const PageBuilder: React.FC = () => {
   const { user, logout } = useAuthStore();
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showManual, setShowManual] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState('');
   const [projectUrl, setProjectUrl] = useState('');
 
@@ -29,8 +31,6 @@ export const PageBuilder: React.FC = () => {
       addSection();
     }
   }, [project.sections.length, addSection]);
-
- 
 
   const handleExport = () => {
     const html = ExportService.generateHTML(project);
@@ -70,6 +70,25 @@ export const PageBuilder: React.FC = () => {
     }
   };
 
+  // Atajos de teclado
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Ctrl+S para guardar
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+      // F1 para abrir ayuda
+      if (e.key === 'F1') {
+        e.preventDefault();
+        setShowManual(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+
   return (
     <div className={styles.builder}>
       <header className={styles.header}>
@@ -92,7 +111,7 @@ export const PageBuilder: React.FC = () => {
             <div className={styles.userName}>{user?.name}</div>
             <div className={styles.userPlan}>
               Plan: <span className={user?.plan === 'pro' ? styles.proBadge : styles.freeBadge}>
-                {user?.plan?.toUpperCase()}
+                {localStorage.getItem('flexichat-plan-type')?.toUpperCase() || user?.plan?.toUpperCase()}
               </span>
             </div>
           </div>
@@ -111,6 +130,13 @@ export const PageBuilder: React.FC = () => {
             </Button>
             <Button variant="primary" size="md" onClick={handlePublish}>
               🚀 Publicar
+            </Button>
+            <Button 
+              variant="secondary" 
+              size="md" 
+              onClick={() => setShowManual(true)}
+            >
+              ❓ Ayuda
             </Button>
             <Button variant="ghost" size="md" onClick={logout}>
               Salir
@@ -132,6 +158,11 @@ export const PageBuilder: React.FC = () => {
       {/* Modal de plantillas */}
       {showTemplates && (
         <TemplateSelector onClose={() => setShowTemplates(false)} />
+      )}
+
+      {/* Modal de Manual de Usuario */}
+      {showManual && (
+        <UserManual onClose={() => setShowManual(false)} />
       )}
 
       {/* Modal de publicación */}
