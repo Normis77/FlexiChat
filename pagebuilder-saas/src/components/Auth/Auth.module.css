@@ -1,0 +1,145 @@
+/* src/components/Auth/Auth.module.css */
+
+.authContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.authBox {
+  background: var(--panel);
+  border-radius: 24px;
+  padding: 48px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.logoIcon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.logo h1 {
+  font-size: 32px;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.authBox h2 {
+  font-size: 28px;
+  margin: 0 0 8px 0;
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--muted);
+  margin: 0 0 32px 0;
+  font-size: 15px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.error {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.divider {
+  text-align: center;
+  position: relative;
+  margin: 24px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.divider span {
+  background: var(--panel);
+  padding: 0 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.switchText {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+.switchLink {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.switchLink:hover {
+  opacity: 0.8;
+}
+
+.terms {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  margin: 16px 0 0 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .authBox {
+    padding: 32px 24px;
+  }
+}

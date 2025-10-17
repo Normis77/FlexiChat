@@ -1,0 +1,57 @@
+/*/src/components/Common/Button.module.css*/
+
+
+.button {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.ghost {
+  border: none;
+  background: transparent;
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--bg);
+}
+
+.sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.md {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.lg {
+  padding: 12px 24px;
+  font-size: 16px;
+}

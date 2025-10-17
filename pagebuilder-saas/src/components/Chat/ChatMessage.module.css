@@ -1,0 +1,54 @@
+/*/src/components/Chat/ChatMessage.module.css*/
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user {
+  align-items: flex-end;
+}
+
+.agent {
+  align-items: flex-start;
+}
+
+.bubble {
+  max-width: 80%;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.user .bubble {
+  background: var(--accent);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.agent .bubble {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+.time {
+  font-size: 11px;
+  color: var(--muted);
+}

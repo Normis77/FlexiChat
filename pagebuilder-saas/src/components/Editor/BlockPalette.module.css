@@ -1,0 +1,169 @@
+/* src/components/Editor/BlockPalette.module.css - MEJORADO */
+
+.palette {
+  width: 280px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.header h3 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.blocksContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.categoryTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-left: 4px;
+}
+
+.blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: grab;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.block:hover {
+  border-color: var(--accent);
+  background: #eff6ff;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.block:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+.icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  flex: 1;
+}
+
+/* Tip Section */
+.tip {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+  border-radius: 10px;
+  border: 1px solid #bfdbfe;
+}
+
+.tipIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.tipText {
+  flex: 1;
+}
+
+.tipText strong {
+  display: block;
+  font-size: 13px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.tipText {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Scrollbar */
+.palette::-webkit-scrollbar {
+  width: 6px;
+}
+
+.palette::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.palette::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.palette::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Animación de drag */
+@keyframes dragPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.block[draggable="true"]:hover {
+  animation: dragPulse 2s ease-in-out infinite;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .palette {
+    width: 100%;
+  }
+}

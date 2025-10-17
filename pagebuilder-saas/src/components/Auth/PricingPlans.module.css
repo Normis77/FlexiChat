@@ -1,0 +1,250 @@
+/* src/components/Auth/PricingPlans.module.css */
+
+.pricingContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 40px 20px;
+}
+
+.header {
+  max-width: 1200px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.logoIcon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.logo h1 {
+  font-size: 28px;
+  margin: 0;
+  color: var(--ink);
+}
+
+.greeting {
+  font-size: 18px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.content h2 {
+  font-size: 42px;
+  text-align: center;
+  margin: 0 0 12px 0;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 18px;
+  color: var(--muted);
+  margin: 0 0 48px 0;
+}
+
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  margin-bottom: 64px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.plan {
+  background: var(--panel);
+  border-radius: 24px;
+  padding: 40px 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.plan:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.planPro {
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+
+.planPro:hover {
+  transform: scale(1.05) translateY(-8px);
+}
+
+.badge {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.planHeader {
+  text-align: center;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+}
+
+.planHeader h3 {
+  font-size: 24px;
+  margin: 0 0 16px 0;
+  color: var(--ink);
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.currency {
+  font-size: 24px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.amount {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.period {
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+}
+
+.features li {
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.check {
+  width: 24px;
+  height: 24px;
+  background: #d1fae5;
+  color: #059669;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.cross {
+  width: 24px;
+  height: 24px;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.faq {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--panel);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.faq h3 {
+  font-size: 28px;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.faqItem {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.faqItem:last-child {
+  border-bottom: none;
+}
+
+.faqItem strong {
+  display: block;
+  font-size: 16px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.faqItem p {
+  font-size: 15px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .content h2 {
+    font-size: 32px;
+  }
+
+  .plans {
+    grid-template-columns: 1fr;
+  }
+
+  .planPro {
+    transform: scale(1);
+  }
+
+  .planPro:hover {
+    transform: translateY(-8px);
+  }
+
+  .faq {
+    padding: 24px;
+  }
+}

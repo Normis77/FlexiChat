@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Builder SaaS — Demo tipo Shopify (Drag & Drop)</title>
+  <style>
+    :root{
+      --bg:#f8fafc; --panel:#ffffff; --ink:#0f172a; --muted:#64748b; --border:#e2e8f0; --accent:#2563eb;
+      --radius:14px; --shadow:0 8px 24px rgba(2,6,23,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; background:linear-gradient(#fff,var(--bg))}
+    .app{display:grid; grid-template-columns:280px 1fr 320px; gap:12px; height:100vh; padding:12px}
+    .panel{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column}
+    .panel h3{margin:0; padding:12px 14px; border-bottom:1px solid var(--border)}
+    .panel .content{padding:12px; overflow:auto}
+    .toolbar{display:flex; align-items:center; gap:8px; padding:10px; border-bottom:1px solid var(--border); background:#fff; position:sticky; top:0; z-index:5}
+    .btn{padding:8px 12px; border:1px solid var(--border); background:#fff; border-radius:10px; cursor:pointer}
+    .btn.primary{background:var(--accent); color:#fff; border-color:transparent}
+    .btn.ghost{background:transparent; border-color:transparent}
+    .btn:disabled{opacity:.5; cursor:not-allowed}
+    .row{display:flex; align-items:center; gap:8px}
+    .grow{flex:1}
+    .input, select, textarea{width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:#fff}
+    .small{font-size:12px; color:var(--muted)}
+
+    /* Paleta de bloques */
+    .block{border:1px dashed var(--border); border-radius:12px; padding:10px; margin-bottom:10px; cursor:grab; background:#fff}
+    .block:hover{background:#f8fafc}
+    .block .title{font-weight:600}
+
+    /* Lienzo */
+    .canvas-wrap{position:relative; overflow:auto; background:conic-gradient(from 180deg at 0 0, #fff, #fff 25%, #f9fbff 0) 0 0/40px 40px}
+    .canvas{max-width:960px; margin:16px auto; padding:16px}
+    .section{position:relative; border:1px solid transparent; border-radius:16px; padding:24px; background:#fff; margin-bottom:12px}
+    .section.drag-over{outline:2px dashed var(--accent)}
+    .handle{position:absolute; inset:auto 12px 12px auto; display:flex; gap:6px}
+    .handle .mini{padding:6px 8px; font-size:12px; border-radius:8px; border:1px solid var(--border); background:#fff; cursor:pointer}
+    .selected{border-color:#c7d2fe; box-shadow:0 0 0 3px #e0e7ff}
+
+    .drop-target{border:2px dashed var(--border); border-radius:16px; padding:22px; color:var(--muted); text-align:center}
+
+    .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    .three-col{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+
+    .hero{padding:48px; border-radius:16px; color:#0b1324; background:linear-gradient(120deg,#eef2ff,#e0f2fe)}
+    .hero h1{font-size:clamp(28px,4vw,48px); margin:0 0 10px}
+    .hero p{color:#475569}
+    .btnline{display:flex; gap:10px; margin-top:14px}
+    .button{display:inline-block; padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:#fff}
+    .button.primary{background:var(--accent); border-color:transparent; color:#fff}
+
+    .card{border:1px solid var(--border); border-radius:14px; padding:14px; background:#fff}
+    .card h4{margin:0 0 6px}
+
+    .banner{padding:14px; border-radius:12px; background:#f1f5f9; text-align:center}
+
+    .gallery{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+    .gallery div{height:90px; background:#e2e8f0; border-radius:10px}
+
+    .product{display:flex; flex-direction:column; gap:8px}
+    .price{font-weight:700}
+
+    .form label{display:block; font-size:13px; color:var(--muted); margin-bottom:4px}
+
+    @media (max-width:1100px){ .app{grid-template-columns:1fr; grid-template-rows:auto 1fr auto} .panel.right{order:3} .panel.left{order:1} .panel.center{order:2} }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="row grow">
+      <button class="btn" id="newPage">➕ Página en blanco</button>
+      <button class="btn" id="templatesBtn">📚 Plantillas</button>
+      <button class="btn" id="saveBtn">💾 Guardar</button>
+      <button class="btn" id="loadBtn">📂 Cargar</button>
+      <button class="btn" id="exportBtn">⬇️ Exportar HTML</button>
+    </div>
+    <div class="row">
+      <label class="small">Color primario</label>
+      <input type="color" id="themeColor" value="#2563eb" />
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- Paleta (izquierda) -->
+    <aside class="panel left">
+      <h3>Bloques</h3>
+      <div class="content" id="palette">
+        <div class="block" draggable="true" data-type="hero">
+          <div class="title">Hero</div>
+          <div class="small">Título + subtítulo + CTA</div>
+        </div>
+        <div class="block" draggable="true" data-type="banner">Banner</div>
+        <div class="block" draggable="true" data-type="text">Texto</div>
+        <div class="block" draggable="true" data-type="two-col">Dos columnas</div>
+        <div class="block" draggable="true" data-type="three-card">Tres tarjetas</div>
+        <div class="block" draggable="true" data-type="product">Producto/Servicio</div>
+        <div class="block" draggable="true" data-type="gallery">Galería</div>
+        <div class="block" draggable="true" data-type="contact">Formulario de contacto</div>
+        <hr/>
+        <div class="small">Arrastra al lienzo →</div>
+      </div>
+    </aside>
+
+    <!-- Lienzo (centro) -->
+    <main class="panel center canvas-wrap">
+      <h3 style="display:flex;align-items:center;gap:8px">Lienzo <span class="small">(haz clic para editar textos)</span></h3>
+      <div class="content">
+        <div class="canvas" id="canvas">
+          <div class="drop-target" id="emptyDrop">Arrastra bloques aquí</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Inspector (derecha) -->
+    <aside class="panel right" id="inspector">
+      <h3>Inspector</h3>
+      <div class="content">
+        <div class="small">Selecciona un bloque del lienzo para ver opciones de estilo y contenido.</div>
+        <div id="inspectorBody" style="margin-top:10px"></div>
+      </div>
+    </aside>
+  </div>
+
+  <template id="tpl-hero">
+    <section class="section hero" data-type="hero">
+      <div contenteditable="true"><h1>Atención remota moderna</h1></div>
+      <p contenteditable="true">Comunicación privada y segura. Reservas y pagos integrados.</p>
+      <div class="btnline">
+        <a href="#" class="button primary" contenteditable="true">Comenzar</a>
+        <a href="#" class="button" contenteditable="true">Ver más</a>
+      </div>
+    </section>
+  </template>
+  <template id="tpl-banner">
+    <section class="section banner" data-type="banner">
+      <div contenteditable="true">✨ Oferta de lanzamiento: 20% OFF en planes anuales</div>
+    </section>
+  </template>
+  <template id="tpl-text">
+    <section class="section" data-type="text">
+      <h2 contenteditable="true">Título de sección</h2>
+      <p contenteditable="true">Escribe una descripción clara de tu servicio o propuesta de valor.</p>
+    </section>
+  </template>
+  <template id="tpl-two-col">
+    <section class="section two-col" data-type="two-col">
+      <div class="card" contenteditable="true"><h4>Columna A</h4><p>Texto editable.</p></div>
+      <div class="card" contenteditable="true"><h4>Columna B</h4><p>Texto editable.</p></div>
+    </section>
+  </template>
+  <template id="tpl-three-card">
+    <section class="section three-col" data-type="three-card">
+      <div class="card" contenteditable="true"><h4>Beneficio 1</h4><p>Detalle breve.</p></div>
+      <div class="card" contenteditable="true"><h4>Beneficio 2</h4><p>Detalle breve.</p></div>
+      <div class="card" contenteditable="true"><h4>Beneficio 3</h4><p>Detalle breve.</p></div>
+    </section>
+  </template>
+  <template id="tpl-product">
+    <section class="section two-col" data-type="product">
+      <div class="product" contenteditable="true">
+        <div class="card"><h2>Servicio Estrella</h2><p>Descripción breve del servicio o producto.</p><div class="price">Q 499</div><a class="button primary" href="#">Comprar</a></div>
+      </div>
+      <div class="gallery">
+        <div></div><div></div><div></div>
+      </div>
+    </section>
+  </template>
+  <template id="tpl-gallery">
+    <section class="section" data-type="gallery">
+      <h3 contenteditable="true">Galería</h3>
+      <div class="gallery"><div></div><div></div><div></div></div>
+    </section>
+  </template>
+  <template id="tpl-contact">
+    <section class="section form" data-type="contact">
+      <h3 contenteditable="true">Contáctanos</h3>
+      <label>Nombre<input class="input" placeholder="Tu nombre"/></label>
+      <label>Correo<input class="input" placeholder="email@dominio.com"/></label>
+      <label>Mensaje<textarea class="input" rows="4" placeholder="¿Cómo podemos ayudar? "></textarea></label>
+      <button class="button primary">Enviar</button>
+    </section>
+  </template>
+
+  <dialog id="templatesDlg" style="border:1px solid var(--border); border-radius:12px; padding:0; width:min(90vw,760px);">
+    <div class="toolbar">
+      <strong>Plantillas</strong>
+      <button class="btn" onclick="templatesDlg.close()">Cerrar</button>
+    </div>
+    <div style="padding:12px; display:grid; gap:12px; grid-template-columns:repeat(2,1fr)">
+      <div class="card"><h4>Restaurante</h4><p class="small">Hero + 3 tarjetas + producto + contacto</p><button class="btn primary" onclick="applyTemplate('restaurant')">Usar</button></div>
+      <div class="card"><h4>Hotel</h4><p class="small">Hero + dos columnas + galería + contacto</p><button class="btn primary" onclick="applyTemplate('hotel')">Usar</button></div>
+      <div class="card"><h4>Consultorio</h4><p class="small">Banner + hero + tres tarjetas + contacto</p><button class="btn primary" onclick="applyTemplate('clinic')">Usar</button></div>
+      <div class="card"><h4>E‑commerce</h4><p class="small">Hero + producto + tres tarjetas</p><button class="btn primary" onclick="applyTemplate('shop')">Usar</button></div>
+    </div>
+  </dialog>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const emptyDrop = document.getElementById('emptyDrop');
+    const palette = document.getElementById('palette');
+    const inspectorBody = document.getElementById('inspectorBody');
+    const themeColor = document.getElementById('themeColor');
+    const templatesDlg = document.getElementById('templatesDlg');
+
+    let selected = null; // sección seleccionada
+
+    const TPL = {
+      'hero': document.getElementById('tpl-hero'),
+      'banner': document.getElementById('tpl-banner'),
+      'text': document.getElementById('tpl-text'),
+      'two-col': document.getElementById('tpl-two-col'),
+      'three-card': document.getElementById('tpl-three-card'),
+      'product': document.getElementById('tpl-product'),
+      'gallery': document.getElementById('tpl-gallery'),
+      'contact': document.getElementById('tpl-contact'),
+    };
+
+    // Drag desde paleta
+    palette.addEventListener('dragstart', (e)=>{
+      const b = e.target.closest('[draggable]');
+      if(!b) return;
+      e.dataTransfer.setData('text/plain', b.dataset.type);
+    });
+
+    // Soltar en canvas
+    canvas.addEventListener('dragover', (e)=>{ e.preventDefault(); emptyDrop.style.display='none'; });
+    canvas.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      const type = e.dataTransfer.getData('text/plain');
+      addSection(type);
+    });
+
+    function addSection(type){
+      const tpl = TPL[type]; if(!tpl) return;
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      enhanceSection(node);
+      canvas.appendChild(node);
+      selectSection(node);
+      emptyDrop.remove();
+    }
+
+    function enhanceSection(sec){
+      sec.tabIndex = 0;
+      sec.addEventListener('click', (e)=>{ if(e.target.closest('.mini')) return; selectSection(sec); });
+      const handle = document.createElement('div');
+      handle.className='handle';
+      handle.innerHTML = `
+        <button class="mini" data-act="up">↑</button>
+        <button class="mini" data-act="down">↓</button>
+        <button class="mini" data-act="dup">⎘</button>
+        <button class="mini" data-act="del">🗑️</button>`;
+      sec.appendChild(handle);
+      handle.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button'); if(!btn) return;
+        const act = btn.dataset.act;
+        if(act==='up' && sec.previousElementSibling) canvas.insertBefore(sec, sec.previousElementSibling);
+        if(act==='down' && sec.nextElementSibling) canvas.insertBefore(sec.nextElementSibling, sec);
+        if(act==='dup'){ const clone = sec.cloneNode(true); enhanceSection(clone); canvas.insertBefore(clone, sec.nextElementSibling); }
+        if(act==='del'){ if(selected===sec) { selected=null; inspectorBody.innerHTML=''; } sec.remove(); }
+      });
+    }
+
+    function selectSection(sec){
+      if(selected) selected.classList.remove('selected');
+      selected = sec; sec.classList.add('selected');
+      renderInspector(sec);
+    }
+
+    function renderInspector(sec){
+      const type = sec.dataset.type;
+      const bg = getComputedStyle(sec).backgroundColor;
+      inspectorBody.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `
+        <div class="small">Tipo: <b>${type}</b></div>
+        <label style="display:block; margin-top:8px">Fondo <input type="color" id="pBg"></label>
+        <label style="display:block; margin-top:8px">Relleno (px) <input type="number" min="0" id="pPad" class="input" value="${parseInt(getComputedStyle(sec).padding)}"></label>
+        <label style="display:block; margin-top:8px">Borde (px) <input type="number" min="0" id="pBorder" class="input" value="${parseInt(getComputedStyle(sec).borderWidth)}"></label>
+        <label style="display:block; margin-top:8px">Radio (px) <input type="number" min="0" id="pRadius" class="input" value="${parseInt(getComputedStyle(sec).borderRadius)}"></label>
+        <div class="sep"></div>
+        <div class="small">Textos seleccionables son <b>contenteditable</b>: haz clic en el título/subtítulo y escribe.</div>
+      `;
+      inspectorBody.appendChild(wrap);
+      // intentar convertir bg a hex básico
+      document.getElementById('pBg').value = rgb2hex(bg) || '#ffffff';
+
+      inspectorBody.oninput = (e)=>{
+        if(e.target.id==='pPad') sec.style.padding = (parseInt(e.target.value)||0) + 'px';
+        if(e.target.id==='pBorder') sec.style.borderWidth = (parseInt(e.target.value)||0) + 'px';
+        if(e.target.id==='pRadius') sec.style.borderRadius = (parseInt(e.target.value)||0) + 'px';
+        if(e.target.id==='pBg') sec.style.background = e.target.value;
+      };
+    }
+
+    function rgb2hex(rgb){
+      if(!rgb) return null; const m = rgb.match(/rgb[a]?\((\d+),\s*(\d+),\s*(\d+)/i); if(!m) return null;
+      const h=x=>('0'+Number(x).toString(16)).slice(-2); return '#'+h(m[1])+h(m[2])+h(m[3]);
+    }
+
+    // Tema global
+    themeColor.addEventListener('input', (e)=>{
+      document.documentElement.style.setProperty('--accent', e.target.value);
+    });
+
+    // Guardar/Cargar/Exportar
+    document.getElementById('saveBtn').addEventListener('click', ()=>{
+      const data = serializeCanvas();
+      localStorage.setItem('builder-saas', JSON.stringify(data));
+      alert('Proyecto guardado en este navegador.');
+    });
+    document.getElementById('loadBtn').addEventListener('click', ()=>{
+      const raw = localStorage.getItem('builder-saas');
+      if(!raw) return alert('No hay nada guardado aún.');
+      loadFromData(JSON.parse(raw));
+    });
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const html = exportHTML();
+      const blob = new Blob([html], {type:'text/html'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='pagina-exportada.html'; a.click();
+    });
+
+    document.getElementById('newPage').addEventListener('click', ()=>{ canvas.innerHTML=''; canvas.appendChild(emptyDrop.cloneNode(true)); });
+    document.getElementById('templatesBtn').addEventListener('click', ()=> templatesDlg.showModal());
+
+    // Plantillas rápidas
+    function applyTemplate(kind){
+      canvas.innerHTML='';
+      const seq = {
+        restaurant:['hero','three-card','product','contact'],
+        hotel:['hero','two-col','gallery','contact'],
+        clinic:['banner','hero','three-card','contact'],
+        shop:['hero','product','three-card']
+      }[kind] || [];
+      seq.forEach(t=>addSection(t));
+      templatesDlg.close();
+    }
+    window.applyTemplate = applyTemplate; // para botones en dialog
+
+    // Serializar el lienzo -> estructura mínima (tipo + innerHTML + estilos inline)
+    function serializeCanvas(){
+      const sections = [...canvas.querySelectorAll('.section')].map(sec => ({
+        type: sec.dataset.type,
+        html: sec.innerHTML, // incluye contenteditable
+        style: sec.getAttribute('style') || ''
+      }));
+      return { theme: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(), sections };
+    }
+
+    function loadFromData(data){
+      document.documentElement.style.setProperty('--accent', data.theme || '#2563eb');
+      canvas.innerHTML='';
+      (data.sections||[]).forEach(s=>{
+        const sec = document.createElement('section');
+        sec.className='section'; sec.dataset.type = s.type; sec.innerHTML = s.html; if(s.style) sec.setAttribute('style', s.style);
+        // asegurar clases por tipo
+        if(s.type==='hero') sec.classList.add('hero');
+        if(s.type==='two-col') sec.classList.add('two-col');
+        if(s.type==='three-card') sec.classList.add('three-col');
+        if(s.type==='banner') sec.classList.add('banner');
+        if(s.type==='form') sec.classList.add('form');
+        enhanceSection(sec);
+        canvas.appendChild(sec);
+      });
+      if(!canvas.children.length){ canvas.appendChild(emptyDrop.cloneNode(true)); }
+    }
+
+    // Exportar una página estática lista para subir
+    function exportHTML(){
+      const data = serializeCanvas();
+      const body = data.sections.map(s=>{
+        const styleAttr = s.style ? ` style="${s.style.replace(/"/g,'&quot;')}"` : '';
+        // limpiar manijas y atributos contenteditable al exportar
+        const clean = s.html
+          .replace(/<div class=\"handle\"[\s\S]*?<\/div>/g,'')
+          .replace(/ contenteditable=\"true\"/g,'');
+        const classes = `section ${s.type==='hero'?'hero':''} ${s.type==='two-col'?'two-col':''} ${s.type==='three-card'?'three-col':''} ${s.type==='banner'?'banner':''}`.trim();
+        return `<section class="${classes}"${styleAttr}>${clean}</section>`;
+      }).join('\n');
+
+      return `<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Página exportada</title>
+<style>
+:root{--accent:${data.theme||'#2563eb'};--border:#e2e8f0;--ink:#0f172a}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;color:var(--ink)}
+.section{max-width:960px;margin:16px auto;padding:24px;border:1px solid var(--border);border-radius:16px}
+.hero{background:linear-gradient(120deg,#eef2ff,#e0f2fe)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.banner{background:#f1f5f9;text-align:center}
+.button{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#fff}
+.button.primary{background:var(--accent);border-color:transparent;color:#fff}
+.input{padding:10px;border:1px solid var(--border);border-radius:10px}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gallery div{height:90px;background:#e2e8f0;border-radius:10px}
+</style></head><body>
+${body}
+</body></html>`;
+    }
+
+    // Interacciones iniciales
+    addSection('hero');
+    addSection('three-card');
+
+  </script>
+</body>
+</html>
